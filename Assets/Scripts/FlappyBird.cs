@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,31 +13,54 @@ public class FlappyBird : MonoBehaviour
     public delegate void onDied();
     public static event onDied died;
 
+    bool losed = false;
+    bool firstTouch = false; // Используется для проверки первого нажатия
+
     void Start()
     {
         Input.simulateMouseWithTouches = true;
         rb = GetComponent<Rigidbody2D>();
+        rb.simulated = false; // Отключаем физику в начале игры
     }
+
     void Update()
     {
-        if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Began)
+        // Ждем первого нажатия для начала движения
+        if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Began || Input.GetMouseButtonDown(0))
         {
-            rb.AddForce(new Vector2(forceX, forceY), ForceMode2D.Impulse);
+            if (!firstTouch)
+            {
+                firstTouch = true;
+                rb.simulated = true; // Включаем физику
+                rb.AddForce(new Vector2(forceX, forceY), ForceMode2D.Impulse); // Начальное движение птицы
+            }
+            else
+            {
+                rb.AddForce(new Vector2(forceX, forceY), ForceMode2D.Impulse); // Добавляем силу при каждом нажатии
+            }
         }
-        if (transform.position.y > 3.7f || transform.position.y < -2.8f)
+
+        // Если птица выходит за пределы экрана
+        if ((transform.position.y > 3.7f || transform.position.y < -2.8f) && !losed)
         {
+            losed = true;
             lose();
         }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        lose();
+        if (!losed)
+        {
+            losed = true;
+            lose();
+        }
     }
 
     void lose()
     {
         died?.Invoke();
-        rb.Sleep();
+        forceX = 0f; // Останавливаем птицу при проигрыше
+        forceY = 0f;
     }
 }

@@ -11,11 +11,13 @@ public class UIGame : MonoBehaviour
     public TMP_Text scoreText;
     public TMP_Text highscoreText;
 
-    private void Start()
+    private void Awake()
     {
+        //DontDestroyOnLoad(this.gameObject);
         highscoreText.text = "Highscore: " + 0.ToString();
         panel.SetActive(false);
         scoreText.gameObject.SetActive(true);
+
         FlappyBird.died += UIEnable;
         TubesSpawn.collect += CoinCollect;
     }
@@ -30,5 +32,11 @@ public class UIGame : MonoBehaviour
     {
         scoreText.text = coins.ToString();
         highscoreText.text = "Highscore: " + coins.ToString();
+    }
+
+    private void OnDestroy()
+    {
+        FlappyBird.died -= UIEnable;
+        TubesSpawn.collect -= CoinCollect;
     }
 }

@@ -1,4 +1,4 @@
-using System.Collections;
+ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,6 +15,9 @@ public class TubesSpawn : MonoBehaviour
     public delegate void onCollect(int coins);
     public static event onCollect collect;
 
+    public delegate void collectSound();
+    public static event collectSound sound;
+
     private void Start()
     {
         GameObject tubeCopy = Instantiate(tubePrefab, new Vector3(transform.position.x + distanceBetweenTubes, Random.Range(minY, maxY)), Quaternion.identity);
@@ -24,6 +27,7 @@ public class TubesSpawn : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         collect?.Invoke(coins++);
+        sound?.Invoke();
         GameObject tubeCopy = Instantiate(tubePrefab, new Vector3(transform.position.x + distanceBetweenTubes, Random.Range(minY, maxY)), Quaternion.identity);
 
         Destroy(tubeCopy, 15);

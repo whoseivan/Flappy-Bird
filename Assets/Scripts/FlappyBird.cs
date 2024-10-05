@@ -9,9 +9,11 @@ public class FlappyBird : MonoBehaviour
     public float forceX = 5;
     public float forceY = 3;
     Rigidbody2D rb;
-
+    public GameObject clickImg;
     public delegate void onDied();
     public static event onDied died;
+    public delegate void onFly();
+    public static event onFly fly;
 
     bool losed = false;
     bool firstTouch = false; // Используется для проверки первого нажатия
@@ -30,9 +32,11 @@ public class FlappyBird : MonoBehaviour
         {
             if (!firstTouch)
             {
+                clickImg.GetComponent<Animator>().Play("Waiting");
                 firstTouch = true;
                 rb.simulated = true; // Включаем физику
-                rb.AddForce(new Vector2(forceX, forceY), ForceMode2D.Impulse); // Начальное движение птицы
+                rb.AddForce(new Vector2(forceX, forceY), ForceMode2D.Impulse); // Начальное движение птицы                           
+                clickImg.SetActive(false);
             }
             else
             {
@@ -60,6 +64,7 @@ public class FlappyBird : MonoBehaviour
     void lose()
     {
         died?.Invoke();
+        GetComponent<SpriteRenderer>().sortingOrder = 1;
         forceX = 0f; // Останавливаем птицу при проигрыше
         forceY = 0f;
     }
